@@ -70,7 +70,7 @@ echo "export KUBECONFIG=$HOME/.kube/config" >> ~/.bashrc
 kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
-echo '================================= Healthcheck ================================='
+echo '================================= Healthcheck =================================' 
 helm version
 sleep 3
 
