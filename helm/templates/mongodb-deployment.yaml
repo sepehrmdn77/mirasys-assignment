@@ -1,0 +1,37 @@
+{{- if .Values.mongodb.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-mongodb
+  labels:
+    app: {{ .Chart.Name }}-mongodb
+    chart: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.mongodb.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-mongodb
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-mongodb
+    spec:
+      containers:
+      - name: mongodb
+        image: {{ .Values.mongodb.image }}
+        ports:
+        - containerPort: {{ .Values.mongodb.service.port }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}-mongodb
+  labels:
+    app: {{ .Chart.Name }}-mongodb
+spec:
+  selector:
+    app: {{ .Chart.Name }}-mongodb
+  ports:
+  - port: {{ .Values.mongodb.service.port }}
+    targetPort: {{ .Values.mongodb.service.port }}
+{{- end }}

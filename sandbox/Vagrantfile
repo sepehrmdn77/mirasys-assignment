@@ -1,0 +1,68 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "bento/ubuntu-24.04"
+  config.vm.box_version = "202502.21.0"
+
+  # master-node
+  config.vm.define "master" do |master|
+    master.vm.box = "bento/ubuntu-24.04"
+    master.vm.box_version = "202502.21.0"
+    master.vm.hostname = "master"
+    master.vm.synced_folder File.expand_path("../../ServiceExample-app"), "/home/vagrant/ServiceExample-app"
+    master.vm.network "forwarded_port", guest: 9080, host: 9080
+    master.vm.network "forwarded_port", guest: 80, host: 8081
+    master.vm.provider "virtualbox" do |vb|
+      vb.memory = "2048"
+      vb.cpus = "2"
+    end
+    master.vm.network "private_network", ip: "192.168.56.10"
+    master.vm.hostname = "master"
+    master.vm.provision "shell", path: "provisioners/master.sh"
+  end
+
+  # worker-node-1
+  config.vm.define "worker1" do |worker1|
+    worker1.vm.box = "bento/ubuntu-24.04"
+    worker1.vm.box_version = "202502.21.0"
+    worker1.vm.hostname = "worker-1"
+    # worker1.vm.network "forwarded_port", guest: 9080, host: 9081
+    worker1.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = "1"
+    end
+    worker1.vm.network "private_network", ip: "192.168.56.11"
+    worker1.vm.hostname = "worker-1"
+    worker1.vm.provision "shell", path: "provisioners/worker-1.sh"
+  end
+
+  # worker-node-2
+  config.vm.define "worker2" do |worker2|
+    worker2.vm.box = "bento/ubuntu-24.04"
+    worker2.vm.box_version = "202502.21.0"
+    worker2.vm.hostname = "worker-2"
+    # worker2.vm.network "forwarded_port", guest: 9080, host: 9082
+    worker2.vm.provider "virtualbox" do |vb|
+      vb.memory = "1024"
+      vb.cpus = "1"
+    end
+    worker2.vm.network "private_network", ip: "192.168.56.12"
+    worker2.vm.hostname = "worker-2"
+    worker2.vm.provision "shell", path: "provisioners/worker-2.sh"
+  end
+
+  # # demo-node
+  # config.vm.define "demo" do |demo|
+  #   demo.vm.box = "bento/ubuntu-24.04"
+  #   demo.vm.box_version = "202502.21.0"
+  #   demo.vm.hostname = "demo"
+  #   demo.vm.synced_folder File.expand_path("../../ServiceExample-app"), "/home/vagrant/ServiceExample-app"
+  #   demo.vm.network "forwarded_port", guest: 9080, host: 9080
+  #   demo.vm.provider "virtualbox" do |vb|
+  #     vb.memory = "2048"
+  #     vb.cpus = "2"
+  #   end
+  #   demo.vm.network "private_network", ip: "192.168.56.13"
+  #   demo.vm.hostname = "demo"
+  #   demo.vm.provision "shell", path: "provisioners/demo.sh"
+  # end
+
+end

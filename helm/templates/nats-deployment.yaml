@@ -1,0 +1,37 @@
+{{- if .Values.nats.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Chart.Name }}-nats
+  labels:
+    app: {{ .Chart.Name }}-nats
+    chart: {{ .Chart.Name }}
+spec:
+  replicas: {{ .Values.nats.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ .Chart.Name }}-nats
+  template:
+    metadata:
+      labels:
+        app: {{ .Chart.Name }}-nats
+    spec:
+      containers:
+      - name: nats
+        image: {{ .Values.nats.image }}
+        ports:
+        - containerPort: {{ .Values.nats.service.port }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}-nats
+  labels:
+    app: {{ .Chart.Name }}-nats
+spec:
+  selector:
+    app: {{ .Chart.Name }}-nats
+  ports:
+  - port: {{ .Values.nats.service.port }}
+    targetPort: {{ .Values.nats.service.port }}
+{{- end }}

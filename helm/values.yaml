@@ -1,0 +1,55 @@
+app:
+  replicaCount: 1
+  image:
+    repository: sepehrmdn/mirasys-assignment
+    tag: "1.0.0"
+    pullPolicy: IfNotPresent
+
+  service:
+    type: ClusterIP
+    port: 9080
+    targetPort: 9080
+    
+  ingress:
+    enabled: true
+    className: "traefik"
+    hosts:
+      - host: myapp.local
+        paths:
+          - path: /
+            pathType: Prefix
+
+  env:
+    - name: "Aspire__MongoDB__Driver__ConnectionString"
+      value: "mongodb://helm-mongodb:27017"
+    - name: "Aspire__StackExchange__Redis__ConnectionString"
+      value: "helm-redis:6379"
+    - name: "Aspire__NATS__Net__ConnectionString"
+      value: "nats://helm-nats:4222"
+    - name: "ASPNETCORE_ENVIRONMENT"
+      value: "Production"
+    - name: "ASPNETCORE_URLS"
+      value: "http://*:9080"
+    - name: "INIT_DELAY"
+      value: "30"
+
+mongodb:
+  enabled: true
+  replicaCount: 1
+  image: "mongo:latest"
+  service:
+    port: 27017
+
+redis:
+  enabled: true
+  replicaCount: 1
+  image: "redis:latest"
+  service:
+    port: 6379
+
+nats:
+  enabled: true
+  replicaCount: 1
+  image: "nats:latest"
+  service:
+    port: 4222
