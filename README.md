@@ -4,7 +4,7 @@ DevOps and automation best practices for a simple .NET application covering task
 | Task | Objective | Solution |
 |:---:|:---:|:---:|
 | Local Demo | Application deployment and structure review | Vagrant |
-| Public repository | Public Git repository | GitHib |
+| Public repository | Public Git repository | GitHub |
 | Secrets | Avoid exposing secrets | GitHub secrets + Azure Key Vault |
 | CI | Automated tests, Build, Publish Docker image | GitHub Actions |
 | Orchestration | Managing containers | K8s |
@@ -38,14 +38,14 @@ The application code is being stored using ***Semantic Versioning*** standard an
 
 ---
 ## Secrets
-In this repository, secrets has been handled using **Azure Key Vault** as the primary secret management vault, and the **GitHub secrets** to store the Azure credentials. 
+In this repository, secrets have been handled using **Azure Key Vault** as the primary secret management vault, and the **GitHub secrets** to store the Azure credentials. 
 
 ---
 
 ## CI pipeline
 The CI pipeline which can be found in the **/.github/workflows/ci.yml** includes jobs below:
 - **Build and test** - Check out the repository ```>```  install the .NET environment and get the runner ready for tests ```>```  build the application ```>```  do tests using the command ```dotnet test```
-- **Docker Image** - Runs only when there is a push on the main branch and there is a valid semantic tag ```>```  check out the repository ```>``` fetch secerts from Azure Key Vault ```>``` extract the semantic tag ```>``` build the Docker image using the semantic tag and push to the [***Dockerhub***](https://hub.docker.com/repository/docker/sepehrmdn/mirasys-assignment/general)
+- **Docker Image** - Runs only when there is a push on the main branch and there is a valid semantic tag ```>```  check out the repository ```>``` fetch secrets from Azure Key Vault ```>``` extract the semantic tag ```>``` build the Docker image using the semantic tag and push to the [***Dockerhub***](https://hub.docker.com/repository/docker/sepehrmdn/mirasys-assignment/general)
 
 ***Notice:*** For more information please check the [**ci.yaml**](https://github.com/sepehrmdn77/mirasys-assignment/blob/main/.github/workflows/ci.yml) file.
 
@@ -59,32 +59,32 @@ helm install <release-name> mirasys-chart/helm --namespace dev --create-namespac
 ```
 
 
-### There is two easy ways to demo the project:
+### There are two easy ways to demo the project:
 ### 1. Local demo
-For this purpose follow the instructions bellow:
+For this purpose follow the instructions below:
 
 ``` bash
 cd ./sandbox
 vagrant up
 ```
-After bootstrapping, there would be a **kubeadm join** command available in the ending of the **/home/vagrant/init-output.txt** file. copy it:
+After bootstrapping, a **kubeadm join** command will be available in the ending of the **/home/vagrant/init-output.txt** file. copy it:
 ``` bash
 vagrant ssh master
 tail init-output.txt
-logout
+exit
 ```
 And run it on both worker node as sudo:
 ``` bash
 vagrant ssh worker-1
 sudo <command>
-logout
+exit
 vagrant ssh worker-2
 sudo <command>
-logout
+exit
 ```
 Then you can install the Helm chart using commands upper mentioned.
 
-***Note*** If you can not get nodes and fetch pods, make sure to run commands below on the master node:
+***Note*** If you cannot get nodes and fetch pods, make sure to run commands below on the master node:
 ```bash
 rm -rf ~/.kube
 sudo mkdir -p $HOME/.kube
@@ -104,7 +104,7 @@ Prometheus + Grafana stack is deployed using kube-prometheus-stack Helm chart vi
 ``` link
 gitops/infrastructure/monitoring/helmrelease-monitoring.yaml
 ```
-Simply can be deployed on the master node running commands below:
+It can simply be deployed on the master node by running the commands below:
 ``` bash
 curl -s https://fluxcd.io/install.sh | sudo bash
 
@@ -116,13 +116,13 @@ flux bootstrap github \
   --branch=main
 ```
 The GitOps process will deploy an storage system using **longhorn**, and a complete monitoring stack using **kube-prometheus-stack**.
-The monitoring stack can be modified via accessing prometheus and it visuallize common metrics such as kubeapi, etc.
+The monitoring stack can be modified via accessing the Prometheus, and it gathers common metrics such as kubeapi, etc.
 
-The Visuallization panel can be accessed via command below:
+The Visualization panel can be accessed using command below:
 ``` bash
 kubectl -n monitoring port-forward svc kube-prometheus-stack-grafana 3000:80
 ```
-## How to Reproduce the Full Cluster - breif
+## How to Reproduce the Full Cluster - brief steps
 ``` text
 1. Clone repo
 
@@ -141,12 +141,12 @@ kubectl -n monitoring port-forward svc kube-prometheus-stack-grafana 3000:80
 8. see the application deployed automatically
 ```
 ## Common issues
-**Vagrant Network**: If you face a network issue in the **Vagrant** cluster, note to make separate **Vagratfiles** and create different VMs to not facing connectivity issue.
-Becuase a single Vagrantfile would use just one internal IP address for the whole cluser and maybe nodes couldn't talk to eachother after orchestration (regardless of 192.168.X.X ranges).
+**Vagrant Network**: If you face a network issue in the **Vagrant** cluster, note to create separate **Vagrantfiles** and different VMs to avoid connectivity issue.
+Because a single Vagrantfile uses only one internal IP address for the whole cluster and maybe nodes couldn't talk to eachother after orchestration (regardless of 192.168.X.X ranges).
 
 # Best to have
-The best practice to deploy the compelete cluster is to implement the infrastructure as code (**IaC**) using Terraform templates with modular instances to have a reliable and repeatable cloud-native deployment.
+The best practice to deploy the complete cluster is to implement the infrastructure as code (**IaC**) using Terraform templates with modular instances to have a reliable and repeatable cloud-native deployment.
 
-The [**/infra**](https://github.com/sepehrmdn77/mirasys-assignment/tree/main/infra) directory includes a basic sample of deplying a simple VM on Azure, simple EC2 instance on AWS, and make them ready to work as a Kubernetes node in which cloud ther are implemented in.
+The [**/infra**](https://github.com/sepehrmdn77/mirasys-assignment/tree/main/infra) directory includes a basic sample of deploying a simple VM on Azure, simple EC2 instance on AWS, and make them ready to work as a Kubernetes node in which cloud they are implemented in.
 
-Also you can build the whole cluster using **AKS**.
+Also you can build the whole cluster using **AKS** and **EKS**.
