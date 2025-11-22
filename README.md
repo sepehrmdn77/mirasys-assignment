@@ -7,13 +7,9 @@ DevOps and automation best practices for a simple .NET application covering task
 | Public repository | Public Git repository | GitHib |
 | Secrets | Avoid exposing secrets | GitHub secrets + Azure Key Vault |
 | CI | Automated tests, Build, Publish Docker image | GitHub Actions |
-| CD | Automated image updater and deployment | ArgoCD |
 | Orchestration | Managing containers | K8s |
 | Orchestration versioning | Application helm chart  | Helm |
-| Monitoring stack | Monitoring common metrics | Prom/Loki/Grafana |
-| ... | ... | ... |
-
-
+| CD & GitOps | Automated image updater and deployment | FluxCD |
 ---
 ## Local Demo
 For the local deployment you can simply use **Vagrant** as a local development environment. For this purpose, first of all find the **/sandbox/Vagrantfile** and uncomment lines 51-65:
@@ -102,3 +98,55 @@ https://killercoda.com/playgrounds/course/kubernetes-playgrounds
 ```
 There are several cluster set-ups (Free and Premium) to demo the project.
 
+## CD \& GitOps - (researched)
+As the Continuous Deployment stack, here we have used FluxCD as the GitOps tool.
+Prometheus + Grafana stack is deployed using kube-prometheus-stack Helm chart via GitOps:
+``` link
+gitops/infrastructure/monitoring/helmrelease-monitoring.yaml
+```
+Simply can be deployed on the master node running commands below:
+``` bash
+curl -s https://fluxcd.io/install.sh | sudo bash
+
+flux bootstrap github \
+  --owner=<GITHUB_USER_OR_ORG> \
+  --repository=<YOUR_GITOPS_REPO> \
+  --path=./gitops/clusters/dev \
+  --personal \
+  --branch=main
+```
+The GitOps process will deploy an storage system using **longhorn**, and a complete monitoring stack using **kube-prometheus-stack**.
+The monitoring stack can be modified via accessing prometheus and it visuallize common metrics such as kubeapi, etc.
+
+The Visuallization panel can be accessed via command below:
+``` bash
+kubectl -n monitoring port-forward svc kube-prometheus-stack-grafana 3000:80
+```
+## How to Reproduce the Full Cluster - breif
+``` text
+1. Clone repo
+
+2. vagrant up
+
+3. kubeadm init
+
+4. kubeadm join
+
+5. flux bootstrap
+
+6. wait for GitOps
+
+7. port-forward grafana
+
+8. see the application deployed automatically
+```
+## Common issues
+**Vagrant Network**: If you face a network issue in the **Vagrant** cluster, note to make separate **Vagratfiles** and create different VMs to not facing connectivity issue.
+Becuase a single Vagrantfile would use just one internal IP address for the whole cluser and maybe nodes couldn't talk to eachother after orchestration (regardless of 192.168.X.X ranges).
+
+# Best to have
+The best practice to deploy the compelete cluster is to implement the infrastructure as code (**IaC**) using Terraform templates with modular instances to have a reliable and repeatable cloud-native deployment.
+
+The [**/infra**](https://github.com/sepehrmdn77/mirasys-assignment/tree/main/infra) directory includes a basic sample of deplying a VM on Azure and make it ready to work as a Kubernetes node.
+
+Also you can build the whole cluster using **AKS**.

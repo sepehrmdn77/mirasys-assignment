@@ -4,6 +4,7 @@ on:
     tags: [ 'v*.*.*' ]
     paths:
       - '!helm/**'
+      - '!infra/**'
       - '!gitops/**'
       - '!assets/**'
       - '!README.md'
