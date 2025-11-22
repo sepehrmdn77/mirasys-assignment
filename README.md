@@ -51,3 +51,54 @@ The CI pipeline which can be found in the **/.github/workflows/ci.yml** includes
 - **Build and test** - Check out the repository ```>```  install the .NET environment and get the runner ready for tests ```>```  build the application ```>```  do tests using the command ```dotnet test```
 - **Docker Image** - Runs only when there is a push on the main branch and there is a valid semantic tag ```>```  check out the repository ```>``` fetch secerts from Azure Key Vault ```>``` extract the semantic tag ```>``` build the Docker image using the semantic tag and push to the [***Dockerhub***](https://hub.docker.com/repository/docker/sepehrmdn/mirasys-assignment/general)
 
+***Notice:*** For more information please check the [**ci.yaml**](https://github.com/sepehrmdn77/mirasys-assignment/blob/main/.github/workflows/ci.yml) file.
+
+---
+## Helm
+The ServiceExample application is completely packaged as a Helm chart and available on the **ArtifactHub**, it can be deployed using following commands below:
+``` bash
+helm repo add mirasys-chart https://sepehrmdn77.github.io
+helm repo update
+helm install <release-name> mirasys-chart/helm --namespace dev --create-namespace
+```
+
+
+### There is two easy ways to demo the project:
+### 1. Local demo
+For this purpose follow the instructions bellow:
+
+``` bash
+cd ./sandbox
+vagrant up
+```
+After bootstrapping, there would be a **kubeadm join** command available in the ending of the **/home/vagrant/init-output.txt** file. copy it:
+``` bash
+vagrant ssh master
+tail init-output.txt
+logout
+```
+And run it on both worker node as sudo:
+``` bash
+vagrant ssh worker-1
+sudo <command>
+logout
+vagrant ssh worker-2
+sudo <command>
+logout
+```
+Then you can install the Helm chart using commands upper mentioned.
+
+***Note*** If you can not get nodes and fetch pods, make sure to run commands below on the master node:
+```bash
+rm -rf ~/.kube
+sudo mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+### 2. Online playground
+There would be another easier way to demo the project, you can find the K8s playground in the link below:
+``` link
+https://killercoda.com/playgrounds/course/kubernetes-playgrounds
+```
+There are several cluster set-ups (Free and Premium) to demo the project.
+

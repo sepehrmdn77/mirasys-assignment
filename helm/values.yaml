@@ -2,7 +2,7 @@ app:
   replicaCount: 1
   image:
     repository: sepehrmdn/mirasys-assignment
-    tag: "1.0.0"
+    tag: "1.0.1"
     pullPolicy: IfNotPresent
 
   service:

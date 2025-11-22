@@ -61,14 +61,13 @@ sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address
 echo '============================ Save the token command ============================'
 sleep 5
 
+kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+kubectl -n kube-flannel rollout status daemonset/kube-flannel-ds --timeout=2m
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 rm -rf ~/.kube
 sudo mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
-export KUBECONFIG=$HOME/.kube/config
-echo "export KUBECONFIG=$HOME/.kube/config" >> ~/.bashrc
-kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 
 echo '================================= Healthcheck =================================' 
 helm version

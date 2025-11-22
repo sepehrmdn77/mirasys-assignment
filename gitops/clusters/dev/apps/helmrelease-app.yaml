@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: myapp
+  namespace: dev
+spec:
+  interval: 1m
+  chart:
+    spec:
+      chart: helm
+      sourceRef:
+        kind: HelmRepository
+        name: mirasys-chart
+        namespace: flux-system
+  values:
+    image:
+      repository: docker.io/sepehrmdn/mirasys-assignment
+      tag: "1.0.1"
+    service:
+      type: ClusterIP
+      port: 9080

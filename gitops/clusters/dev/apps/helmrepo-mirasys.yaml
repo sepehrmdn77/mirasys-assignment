@@ -1,0 +1,8 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: HelmRepository
+metadata:
+  name: mirasys-chart
+  namespace: flux-system
+spec:
+  url: https://sepehrmdn77.github.io
+  interval: 1m

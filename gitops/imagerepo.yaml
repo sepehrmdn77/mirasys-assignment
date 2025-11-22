@@ -1,0 +1,8 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: ImageRepository
+metadata:
+  name: mirasys-images
+  namespace: flux-system
+spec:
+  image: docker.io/sepehrmdn/mirasys-assignment
+  interval: 1m
