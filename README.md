@@ -147,6 +147,6 @@ Becuase a single Vagrantfile would use just one internal IP address for the whol
 # Best to have
 The best practice to deploy the compelete cluster is to implement the infrastructure as code (**IaC**) using Terraform templates with modular instances to have a reliable and repeatable cloud-native deployment.
 
-The [**/infra**](https://github.com/sepehrmdn77/mirasys-assignment/tree/main/infra) directory includes a basic sample of deplying a VM on Azure and make it ready to work as a Kubernetes node.
+The [**/infra**](https://github.com/sepehrmdn77/mirasys-assignment/tree/main/infra) directory includes a basic sample of deplying a simple VM on Azure, simple EC2 instance on AWS, and make them ready to work as a Kubernetes node in which cloud ther are implemented in.
 
 Also you can build the whole cluster using **AKS**.
