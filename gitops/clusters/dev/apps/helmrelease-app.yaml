@@ -7,7 +7,8 @@ spec:
   interval: 1m
   chart:
     spec:
-      chart: helm
+      chart: service-example
+      version: "0.1.0"  
       sourceRef:
         kind: HelmRepository
         name: mirasys-chart
