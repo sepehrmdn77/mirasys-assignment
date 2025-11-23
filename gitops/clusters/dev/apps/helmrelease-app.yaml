@@ -14,9 +14,16 @@ spec:
         name: mirasys-chart
         namespace: flux-system
   values:
-    image:
-      repository: docker.io/sepehrmdn/mirasys-assignment
-      tag: "1.0.1"
-    service:
-      type: ClusterIP
-      port: 9080
+    app:
+      image:
+        repository: sepehrmdn/mirasys-assignment
+        tag: "1.0.1"
+      service:
+        type: ClusterIP
+        port: 9080
+    mongodb:
+      enabled: true
+    redis:
+      enabled: true
+    nats:
+      enabled: true
