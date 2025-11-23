@@ -119,14 +119,6 @@ flux bootstrap github \
   --path="./gitops" \
   --personal \
   --branch=main
-
-
-flux bootstrap github \
-  --owner=$GITHUB_USER \
-  --repository=mirasys-assignment \
-  --path=./gitops/clusters/dev \
-  --personal \
-  --branch=main
 ```
 The GitOps process will deploy an storage system using **longhorn**, and a complete monitoring stack using **kube-prometheus-stack**.
 The monitoring stack can be modified via accessing the Prometheus, and it gathers common metrics such as kubeapi, etc.
