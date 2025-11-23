@@ -9,9 +9,10 @@ DevOps and automation best practices for a simple .NET application covering task
 | CI | Automated tests, Build, Publish Docker image | GitHub Actions |
 | Orchestration | Managing containers | K8s |
 | Orchestration versioning | Application helm chart  | Helm |
-| CD & GitOps | Automated image updater and deployment | FluxCD |
+| Monitoring stack | Monitoring throw GitOps | kube-prometheus-stack |
+| Storage solution | Storage solution via GitOps | Longhorn |
 ---
-## Local Demo
+## Docker Compose Local Demo
 For the local deployment you can simply use **Vagrant** as a local development environment. For this purpose, first of all find the **/sandbox/Vagrantfile** and uncomment lines 51-65:
 <p align="center">
   <img src="./assets/demo-node-iac.png" alt="Logo" width="900" height="250">
@@ -76,15 +77,15 @@ exit
 And run it on both worker node as sudo:
 ``` bash
 vagrant ssh worker-1
-sudo <command>
+sudo <join-command>
 exit
 vagrant ssh worker-2
-sudo <command>
+sudo <join-command>
 exit
 ```
 Then you can install the Helm chart using commands upper mentioned.
 
-***Note*** If you cannot get nodes and fetch pods, make sure to run commands below on the master node:
+***Note:*** If you cannot get nodes and fetch pods, your kubectl config files are not copied and served, so make sure to run commands below on the master node:
 ```bash
 rm -rf ~/.kube
 sudo mkdir -p $HOME/.kube
@@ -108,9 +109,12 @@ It can simply be deployed on the master node by running the commands below:
 ``` bash
 curl -s https://fluxcd.io/install.sh | sudo bash
 
+export GITHUB_USER='<github_username>'
+export GITHUB_TOKEN='<classic_token>' # If it is private repository
+
 flux bootstrap github \
-  --owner=<GITHUB_USER_OR_ORG> \
-  --repository=<YOUR_GITOPS_REPO> \
+  --owner=$GITHUB_USER \
+  --repository=mirasys-assignment \
   --path=./gitops/clusters/dev \
   --personal \
   --branch=main
@@ -122,6 +126,10 @@ The Visualization panel can be accessed using command below:
 ``` bash
 kubectl -n monitoring port-forward svc kube-prometheus-stack-grafana 3000:80
 ```
+From this point, the FluxCD will do the GitOps operation and is listening to your repository for any changes.
+
+---
+
 ## How to Reproduce the Full Cluster - brief steps
 ``` text
 1. Clone repo
@@ -140,13 +148,32 @@ kubectl -n monitoring port-forward svc kube-prometheus-stack-grafana 3000:80
 
 8. see the application deployed automatically
 ```
+
+---
+
 ## Common issues
 **Vagrant Network**: If you face a network issue in the **Vagrant** cluster, note to create separate **Vagrantfiles** and different VMs to avoid connectivity issue.
 Because a single Vagrantfile uses only one internal IP address for the whole cluster and maybe nodes couldn't talk to eachother after orchestration (regardless of 192.168.X.X ranges).
+
+Also you can modify the kubelet configs available in the ```/etc/systemd/system/kubelet.service.d/10-node-ip.conf``` and make sure it exists and you can find the config file below:
+``` bash
+[Service]
+Environment="KUBELET_EXTRA_ARGS=--node-ip=192.168.56.x" # Modify x
+```
+After this step, do the same operation on the ```/var/lib/kubelet/kubeadm-flags.env``` file and modify the parameter below:
+``` bash
+'KUBELET_KUBEADM_ARGS="--container-runtime-endpoint=unix:///var/run/containerd/containerd.sock --pod-infra-container-image=registry.k8s.io/pause:3.9 --node-ip=192.168.56.x"' # Modify x
+```
+
+---
 
 # Best to have
 The best practice to deploy the complete cluster is to implement the infrastructure as code (**IaC**) using Terraform templates with modular instances to have a reliable and repeatable cloud-native deployment.
 
 The [**/infra**](https://github.com/sepehrmdn77/mirasys-assignment/tree/main/infra) directory includes a basic sample of deploying a simple VM on Azure, simple EC2 instance on AWS, and make them ready to work as a Kubernetes node in which cloud they are implemented in.
 
+***Note:*** After IaC orcehstration please find the ```/etc/systemd/system/kubelet.service.d/10-node-ip.conf``` file and enter your instance IP and the node IP.
+
 Also you can build the whole cluster using **AKS** and **EKS**.
+
+---

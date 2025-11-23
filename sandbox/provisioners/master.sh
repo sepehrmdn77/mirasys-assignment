@@ -56,21 +56,31 @@ sudo sysctl --system
 echo '================================= Healthcheck ================================='
 ls /proc/sys/net/bridge/
 
+sudo mkdir -p /etc/systemd/system/kubelet.service.d
+echo -e "[Service]\nEnvironment=\"KUBELET_EXTRA_ARGS=--node-ip=192.168.56.10\"" | sudo tee /etc/systemd/system/kubelet.service.d/10-node-ip.conf
+echo 'KUBELET_KUBEADM_ARGS="--container-runtime-endpoint=unix:///var/run/containerd/containerd.sock --pod-infra-container-image=registry.k8s.io/pause:3.9 --node-ip=192.168.56.10"' | sudo tee /var/lib/kubelet/kubeadm-flags.env
+sudo systemctl daemon-reexec
+sudo systemctl restart kubelet
+
+
+
 sudo kubeadm reset -f
 sudo kubeadm init --pod-network-cidr=10.244.0.0/16 --apiserver-advertise-address=192.168.56.10 | tee init-output.txt
 echo '============================ Save the token command ============================'
 sleep 5
 
-kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
-kubectl -n kube-flannel rollout status daemonset/kube-flannel-ds --timeout=2m
-curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 rm -rf ~/.kube
 sudo mkdir -p $HOME/.kube
 sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
+kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/kube-flannel.yml
+kubectl -n kube-flannel rollout status daemonset/kube-flannel-ds --timeout=2m
+curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+curl -s https://fluxcd.io/install.sh | sudo bash
 
 echo '================================= Healthcheck =================================' 
 helm version
+flux --version
 sleep 3
 
 echo "Cluster initialized, you can now join workers."

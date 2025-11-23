@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 sudo hostnamectl set-hostname worker-1
 sudo swapoff -a
@@ -42,6 +42,13 @@ apt-cache policy kubelet | head -n 20
 
 sudo apt-get install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl containerd
+
+sudo mkdir -p /etc/systemd/system/kubelet.service.d
+sudo nano /etc/systemd/system/kubelet.service.d/10-node-ip.conf
+echo -e "[Service]\nEnvironment=\"KUBELET_EXTRA_ARGS=--node-ip=localhost\"" | sudo tee /etc/systemd/system/kubelet.service.d/10-node-ip.conf
+echo 'KUBELET_KUBEADM_ARGS="--container-runtime-endpoint=unix:///var/run/containerd/containerd.sock --pod-infra-container-image=registry.k8s.io/pause:3.9 --node-ip=localhost"' | sudo tee /var/lib/kubelet/kubeadm-flags.env
+sudo systemctl daemon-reexec
+sudo systemctl restart kubelet
 
 echo '================================= Healthcheck ================================='
 sudo systemctl start kubelet.service
