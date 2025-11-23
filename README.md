@@ -9,7 +9,7 @@ DevOps and automation best practices for a simple .NET application covering task
 | CI | Automated tests, Build, Publish Docker image | GitHub Actions |
 | Orchestration | Managing containers | K8s |
 | Orchestration versioning | Application helm chart  | Helm |
-| Monitoring stack | Monitoring throw GitOps | kube-prometheus-stack |
+| Monitoring stack | Monitoring through GitOps | kube-prometheus-stack |
 | Storage solution | Storage solution via GitOps | Longhorn |
 
 ---
