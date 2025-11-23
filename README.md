@@ -11,6 +11,19 @@ DevOps and automation best practices for a simple .NET application covering task
 | Orchestration versioning | Application helm chart  | Helm |
 | Monitoring stack | Monitoring throw GitOps | kube-prometheus-stack |
 | Storage solution | Storage solution via GitOps | Longhorn |
+
+---
+## Project tree:
+``` bash
+.
+├── app # .Net applciation, docker image, etc
+├── assets # Some images as the references for the README.md
+├── gitops # CD and deployment automation >>> using FluxCD
+├── helm # Helm chart >>> published
+├── infra # IaC using Terraform for production level and cloud-native deployment
+├── README.md
+└── sandbox # Simple demo and sandbox with IaC using Vagrant
+```
 ---
 ## Docker Compose Local Demo
 For the local deployment you can simply use **Vagrant** as a local development environment. For this purpose, first of all find the **/sandbox/Vagrantfile** and uncomment lines 51-65:
@@ -52,7 +65,11 @@ The CI pipeline which can be found in the **/.github/workflows/ci.yml** includes
 
 ---
 ## Helm
-The ServiceExample application is completely packaged as a Helm chart and available on the **ArtifactHub**, it can be deployed using following commands below:
+The ServiceExample application is completely packaged as a Helm chart including:
+1. The **ServiceExample** application
+2. **MongoDB**, **Nats**, and the **Redis** in the [/helm/templates/](https://github.com/sepehrmdn77/mirasys-assignment/tree/main/helm/templates)
+
+And it is available on the **ArtifactHub**, it can be deployed using following commands below (***it is not an umbrella chart and would deploy everything on a single chart***):
 ``` bash
 helm repo add mirasys-chart https://sepehrmdn77.github.io
 helm repo update
@@ -100,8 +117,19 @@ https://killercoda.com/playgrounds/course/kubernetes-playgrounds
 There are several cluster set-ups (Free and Premium) to demo the project.
 
 ## CD \& GitOps - (researched)
-As the Continuous Deployment stack, here we have used FluxCD as the GitOps tool.
-Prometheus + Grafana stack is deployed using kube-prometheus-stack Helm chart via GitOps:
+**GitOps tree:**
+``` bash
+gitops
+├── gitops/clusters # Dev cluster containing the main application
+├── gitops/flux-system # Flux made commit for the desire stat
+├── gitops/imagepolicy.yaml # Image auto update policy
+├── gitops/imagerepo.yaml # Image auto update policy
+├── gitops/imageupdate.yaml # Image auto update policy
+├── gitops/infrastructure # Namespaces, monitoring stack, and storage
+└── gitops/kustomization.yaml # root kustomization file
+```
+As the Continuous Deployment stack, here we have used **FluxCD** as the GitOps tool and **Loghorn** is present as the storage solution.
+**Prometheus + Grafana stack** is deployed using **kube-prometheus-stack** Helm chart via GitOps:
 ``` link
 gitops/infrastructure/monitoring/helmrelease-monitoring.yaml
 ```
@@ -121,6 +149,10 @@ flux bootstrap github \
   --personal \
   --branch=main
 ```
+Through running these commands you are doing these steps:
+1. Installing FluxCD
+2. installing image-automation-controller - For auto image updates
+3. Bootsrapping the cluster using FluxCD and complete GitOps
 
 And for the health check you can check if **git repository** added using command below:
 ``` bash
@@ -130,7 +162,7 @@ Also you can check **kustomization** status:
 ``` bash
 kubectl get kustomization -A
 ```
-Application release healthcheck:
+Application release healt hcheck:
 ``` bash
 flux get helmrelease -A
 flux get sources helm -A
@@ -145,13 +177,32 @@ kubectl -n monitoring port-forward svc kube-prometheus-stack-grafana 3000:80
 ```
 From this point, the FluxCD will do the GitOps operation and is listening to your repository for any changes.
 
+
+After bootstrapping the FluxCD you're going to have the cluster below:
+<p align="center">
+  <img src="./assets/all_pods.png" alt="Logo" width="900" height="650">
+</p>
+
+### App auto deployment (image automation):
+As it was mentioned before the CRD would be installing using the command:
+``` bash
+flux install --components=image-reflector-controller,image-automation-controller
+```
+After installation,the **image automation** would be started automaticaly according the files below:
+
+[**/gitops/imagepolicy.yaml**](https://github.com/sepehrmdn77/mirasys-assignment/blob/main/gitops/imagepolicy.yaml)
+
+[**/gitops/imagerepo.yaml**](https://github.com/sepehrmdn77/mirasys-assignment/blob/main/gitops/imagerepo.yaml)
+
+[**/gitops/imageupdate.yaml**](https://github.com/sepehrmdn77/mirasys-assignment/blob/main/gitops/imageupdate.yaml)
+
 ---
 
 ## How to Reproduce the Full Cluster - brief steps
 ``` text
 1. Clone repo
 
-2. vagrant up
+2. vagrant up (or a cloud VM bootstrap)
 
 3. kubeadm init
 
