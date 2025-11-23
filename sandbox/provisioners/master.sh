@@ -77,6 +77,7 @@ kubectl apply -f https://github.com/flannel-io/flannel/releases/latest/download/
 kubectl -n kube-flannel rollout status daemonset/kube-flannel-ds --timeout=2m
 curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
 curl -s https://fluxcd.io/install.sh | sudo bash
+flux install --components=image-reflector-controller,image-automation-controller
 
 echo '================================= Healthcheck =================================' 
 helm version

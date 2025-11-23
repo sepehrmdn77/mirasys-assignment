@@ -121,6 +121,21 @@ flux bootstrap github \
   --personal \
   --branch=main
 ```
+
+And for the health check you can check if **git repository** added using command below:
+``` bash
+kubectl get gitrepository -A
+```
+Also you can check **kustomization** status:
+``` bash
+kubectl get kustomization -A
+```
+Application release healthcheck:
+``` bash
+flux get helmrelease -A
+flux get sources helm -A
+```
+
 The GitOps process will deploy an storage system using **longhorn**, and a complete monitoring stack using **kube-prometheus-stack**.
 The monitoring stack can be modified via accessing the Prometheus, and it gathers common metrics such as kubeapi, etc.
 
