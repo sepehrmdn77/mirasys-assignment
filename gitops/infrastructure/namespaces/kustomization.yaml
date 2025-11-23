@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
   - dev.yaml
   - monitoring.yaml
+  - longhorn-system.yaml
