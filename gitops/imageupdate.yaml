@@ -1,18 +1,22 @@
-apiVersion: image.toolkit.fluxcd.io/v1alpha2
+apiVersion: image.toolkit.fluxcd.io/v1
 kind: ImageUpdateAutomation
 metadata:
   name: mirasys-update
   namespace: flux-system
 spec:
+  interval: 1m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
   git:
     checkout:
       ref:
         branch: main
     commit:
-      author:
-        email: flux-bot@example.com
-        name: flux-bot
+      authorName: fluxcdbot
+      authorEmail: fluxcdbot@users.noreply.github.com
     push:
       branch: main
   update:
+    path: ./gitops/clusters/dev/apps
     strategy: Setters
