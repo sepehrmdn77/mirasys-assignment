@@ -108,6 +108,7 @@ gitops/infrastructure/monitoring/helmrelease-monitoring.yaml
 Notice that for the GitOps deployment, all we have to do is to provide GitHub token (for priavte repositories), GitHub user, and the repository, then the GitOps can simply be deployed on the master node by running the commands below:
 ``` bash
 curl -s https://fluxcd.io/install.sh | sudo bash
+flux install --components=image-reflector-controller,image-automation-controller
 
 export GITHUB_USER='<github_username>'
 export GITHUB_TOKEN='<classic_token>'
